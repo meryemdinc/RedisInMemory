@@ -1,14 +1,14 @@
-namespace InMemoryApp.Web
+﻿namespace InMemoryApp.Web
 {
     public class Program
     {
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+           builder.Services.AddMemoryCache();//memory e bir datayı cacheleyebilmemiz için öncelikli olarak bir servise ihtiyacımız var.
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-
+        
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
