@@ -5,7 +5,12 @@ namespace IDistibutedCacheRedisApp.Web
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-
+            
+            builder.Services.AddStackExchangeRedisCache(options =>
+            {
+                options.Configuration = "localhost:6379"; // Redis server configuration
+        
+            });
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
