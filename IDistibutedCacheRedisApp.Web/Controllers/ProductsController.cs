@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IDistibutedCacheRedisApp.Web.Models;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
+using Newtonsoft.Json;
+using System.Text;
 
 namespace IDistibutedCacheRedisApp.Web.Controllers
 {
@@ -17,17 +20,36 @@ namespace IDistibutedCacheRedisApp.Web.Controllers
         {
             DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
             options.SetAbsoluteExpiration(TimeSpan.FromMinutes(1));
-            _distributedCache.SetString("ad", "Fatih", options);
-            await _distributedCache.SetStringAsync("soyad", "Cakiroglu");//await bu satırdaki işlem bitene kadar alt satıra geçilmemesini sağlar.
+            Product product = new Product
+            {
+                ID = 1,
+                Name = "Kalem",
+                Price = 10
+            };
+            string jsonProduct = JsonConvert.SerializeObject(product);
+            Byte[] byteProduct= Encoding.UTF8.GetBytes(jsonProduct);
+            _distributedCache.Set("product:1",byteProduct, options);
+            //   await   _distributedCache.SetStringAsync("product:1", jsonProduct, options);
+            /*   _distributedCache.SetString("ad", "Fatih", options);
+               await _distributedCache.SetStringAsync("soyad", "Cakiroglu"); //await bu satırdaki işlem bitene kadar alt satıra geçilmemesini sağlar.*/
             return View();
         }
         public IActionResult Show()
         {
-            string ad = _distributedCache.GetString("ad");
-            ViewBag.ad = ad;
+            Byte[] byteProduct = _distributedCache.Get("product:1");
+            string byteProductString = Encoding.UTF8.GetString(byteProduct);
+            Product p = JsonConvert.DeserializeObject<Product>(byteProductString);
+            ViewBag.product = p;
+
+            //  string jsonProduct = _distributedCache.GetString("product:1");
+            //  Product p=JsonConvert.DeserializeObject<Product>(jsonProduct);
+            //  ViewBag.product = p;
+
+            //  string ad = _distributedCache.GetString("ad");
+            //ViewBag.ad = ad;
             return View();
         }
-        public IActionResult Remove()
+          public IActionResult Remove()
         {
             _distributedCache.Remove("ad");
             return View();
