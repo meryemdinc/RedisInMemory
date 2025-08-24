@@ -1,3 +1,5 @@
+﻿using RedisExchangeAPI.Web.Services;
+
 namespace RedisExchangeAPI.Web
 {
     public class Program
@@ -6,26 +8,29 @@ namespace RedisExchangeAPI.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            // Servisleri ekle
+            builder.Services.AddSingleton<RedisService>();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+            // Middleware
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
 
+            // Redis bağlanma
+            var redisService = app.Services.GetRequiredService<RedisService>();
+            redisService.Connect();
+
+            // Route
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
