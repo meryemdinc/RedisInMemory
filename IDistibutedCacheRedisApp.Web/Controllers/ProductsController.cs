@@ -27,8 +27,8 @@ namespace IDistibutedCacheRedisApp.Web.Controllers
                 Price = 10
             };
             string jsonProduct = JsonConvert.SerializeObject(product);
-            Byte[] byteProduct= Encoding.UTF8.GetBytes(jsonProduct);
-            _distributedCache.Set("product:1",byteProduct, options);
+            Byte[] byteProduct = Encoding.UTF8.GetBytes(jsonProduct);
+            _distributedCache.Set("product:1", byteProduct, options);
             //   await   _distributedCache.SetStringAsync("product:1", jsonProduct, options);
             /*   _distributedCache.SetString("ad", "Fatih", options);
                await _distributedCache.SetStringAsync("soyad", "Cakiroglu"); //await bu satırdaki işlem bitene kadar alt satıra geçilmemesini sağlar.*/
@@ -49,11 +49,34 @@ namespace IDistibutedCacheRedisApp.Web.Controllers
             //ViewBag.ad = ad;
             return View();
         }
-          public IActionResult Remove()
+        public IActionResult Remove()
         {
             _distributedCache.Remove("ad");
             return View();
         }
+
+        public IActionResult ImageCache()
+        {
+           DistributedCacheEntryOptions options = new DistributedCacheEntryOptions();
+            options.SetAbsoluteExpiration(TimeSpan.FromSeconds(10)); 
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images/download.jpg");
+            byte[] imageByte = System.IO.File.ReadAllBytes(path);
+            _distributedCache.Set("resim", imageByte);
+            return View();
+        }
+        public IActionResult ImageUrl()
+        {
+            byte[] resimByte = _distributedCache.Get("resim");  
+
+            return File(resimByte, "image/jpeg"); // Burada resim türünü belirtmek önemlidir.
+
+        }
+        public IActionResult ImageRemove()
+        {
+            _distributedCache.Remove("resim"); // cache'ten resmi sil
+            return RedirectToAction("Index"); // İstersen RedirectToAction ile başka bir sayfaya yönlendirebilirsin
+        }
+       
 
     }
 }
