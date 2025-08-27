@@ -1,0 +1,30 @@
+﻿@*
+ controllerda name isimli parametre aldığımız için input name="name" oldu
+DeleteItem methodu için bir tane link olusturduk(a) linkin gidiceği route u belirledik *@
+@model List<string> 
+@{
+    ViewData["Title"] = "Index";
+}
+<h1>
+    Index
+</h1>
+<a asp-action="DeleteFirstItem">
+    Baştan sil
+</a>
+<form method="post" asp-action="Add" enctype="application/x-www-form-urlencoded">
+    <input type="text" name="name"/>
+    <button type="submit">Kaydet</button>
+</form>
+@foreach(var item in Model)
+{
+
+	<h1>@item
+        
+        
+        <a asp-controller="ListType" asp-action="DeleteItem" asp-route-name="@item">sil</a>
+
+
+</h1>
+
+
+}
